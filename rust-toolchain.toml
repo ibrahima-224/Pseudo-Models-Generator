@@ -1,0 +1,14 @@
+# Toolchain MSRV du projet PMG (décision d'architecture, doc 01 D10).
+# Référence : docs/architecture/02-workspace-et-crates.md §7.
+#
+# Note (Sprint 0) : « 1.80 » est déclaré dans [workspace.package].rust-version
+# (MSRV) et vérifié par le job CI `msrv` (cargo +1.80 check). Ici, la
+# toolchain locale du développeur reste utilisée (condition `rustup`) pour ne
+# pas bloquer la validation locale lorsque la toolchain 1.80 n'est pas
+# installée. La vérification MSRV en CI reste stricte et inchangée.
+[toolchain]
+channel = "stable"
+profile = "minimal"
+components = ["clippy", "rustfmt"]
+targets = ["x86_64-unknown-linux-gnu"]
+rustup = true

@@ -1,0 +1,31 @@
+{
+  "name": "deepseek_v4_flash_statistical_profile",
+  "version": "1.0.0",
+  "description": "Profil statistique pour DeepSeek-V4-Flash",
+  "distributions": {
+    "weight_distribution": "normal",
+    "outlier_distribution": "student_t",
+    "correlation_strength": 0.25,
+    "low_rank_strength": 0.15
+  },
+  "outlier_config": {
+    "probability": 0.015,
+    "severity_factor": 4.0,
+    "layer_variation": true
+  },
+  "correlation_config": {
+    "enabled": true,
+    "max_correlation": 0.4,
+    "layer_decay": 0.85
+  },
+  "low_rank_config": {
+    "enabled": true,
+    "rank_ratio": 0.12,
+    "strength": 0.06
+  },
+  "super_weight_config": {
+    "enabled": true,
+    "probability": 0.0015,
+    "magnitude_factor": 12.0
+  }
+}

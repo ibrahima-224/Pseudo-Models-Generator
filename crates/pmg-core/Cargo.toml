@@ -1,0 +1,23 @@
+# Crate pmg-core — types fondamentaux et invariants de PMG.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.1.
+[package]
+name = "pmg-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+# pmg-core est le socle du workspace : uniquement des dépendances légères,
+# partagées et pinées depuis [workspace.dependencies] (docs/architecture/02 §2).
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = "0.11"
+thiserror = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.27"

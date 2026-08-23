@@ -1,0 +1,28 @@
+# Crate pmg-io — entrées-sorties : Safetensors, JSON, HTTP Range, filesystem.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.6.
+[package]
+name = "pmg-io"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+thiserror = { version = "2.0" }
+reqwest = { version = "0.12", features = ["blocking"], optional = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+sha2 = { version = "0.11", optional = true }
+dirs = { version = "5.0", optional = true }
+
+[dev-dependencies]
+safetensors = "0.8"
+tempfile = "3.27"
+
+[features]
+http-range = ["reqwest", "sha2", "dirs"]

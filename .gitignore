@@ -1,0 +1,166 @@
+# =============================================================================
+# Fichier .gitignore du projet PMG - Version Révisée
+# =============================================================================
+# Objectif : Exclure uniquement les fichiers non essentiels tout en conservant
+# les sources, configurations et documentation importantes.
+# Dernière mise à jour : 2026-08-23
+# =============================================================================
+
+# =============================================================================
+# 1. BUILD / COMPILATION (Critique)
+# =============================================================================
+# Répertoire de compilation Cargo (contient des Go de fichiers)
+/target/
+
+# Fichiers objets et bibliothèques compilées
+*.o
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# Exécutables et fichiers de débogage
+*.exe
+*.out
+*.pdb
+
+# Fichiers intermédiaires de compilation Rust
+*.d
+*.rlib
+*.rmeta
+
+# =============================================================================
+# 2. IDE / ÉDITEUR
+# =============================================================================
+# Configurations spécifiques aux éditeurs (pas de valeur partagée)
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.iml
+
+# =============================================================================
+# 3. LOGS ET TEMPORAIRES
+# =============================================================================
+# Fichiers de journalisation et temporaires
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+
+# Dossiers de logs (générés dynamiquement)
+logs/
+test_logs/
+
+# =============================================================================
+# 4. CACHE ET PROFILING
+# =============================================================================
+# Cache Cargo personnalisé
+.cargo_cache/
+
+# Fichiers de profiling (llvm-cov, etc.)
+*.profraw
+*.profdata
+
+# Rapports de couverture
+coverage/
+lcov.info
+
+# Documentation générée par rustdoc (volumineuse)
+target/doc/
+
+# =============================================================================
+# 5. TESTS VOLUMINEUX
+# =============================================================================
+# Fichiers safetensors (peuvent atteindre plusieurs Go)
+*.safetensors
+
+# =============================================================================
+# 6. RAPPORTS GÉNÉRÉS
+# =============================================================================
+# Rapports générés dynamiquement (régénérables)
+audit-reports/
+benchmark_results/
+test_results/
+
+# =============================================================================
+# 7. ENVIRONNEMENTS ET SECRETS
+# =============================================================================
+# Variables d'environnement (sécurité)
+.env
+.env.*
+
+# Clés cryptographiques (jamais versionnées)
+*.pem
+*.key
+
+# =============================================================================
+# 8. FICHIERS SYSTÈME
+# =============================================================================
+# Métadonnées système (pas de valeur pour le projet)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# 9. DISTRIBUTION ET BUILD
+# =============================================================================
+# Dossiers de distribution et de build
+dist/
+build/
+*.bundle
+
+# =============================================================================
+# 10. MODÈLES GÉNÉRÉS
+# =============================================================================
+# Résultats de génération (volumineux et régénérables)
+fixtures/generated_*/
+models/generated_*/
+
+# =============================================================================
+# 11. DOCUMENTATION GÉNÉRÉE
+# =============================================================================
+# Documentation générée (à distinguer de docs/ source)
+doc/
+# - memory/ (bank mémoire du projet)
+memory/
+
+# documentations architecture:
+docs/architecture/
+
+# - scripts/ (scripts utilitaires)
+scripts/
+
+# profiles statistiques des models
+statistic_profiles/
+
+# logs pour les testes
+test_logs/
+
+# =============================================================================
+# 12. DÉPENDANCES PYTHON/NODE (si présentes)
+# =============================================================================
+# Dépendances Python et Node.js (si le projet utilise des outils mixtes)
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# =============================================================================
+# NOTES IMPORTANTES
+# =============================================================================
+# CE QUI EST CONSERVÉ (ne pas exclure) :
+# - Cargo.toml, Cargo.lock (manifeste et verrouillage des dépendances)
+# - README.md, LICENSE, .clippy.toml (fichiers racine essentiels)
+# - CHANGELOG.md, CONTRIBUTING.md (documentation importante)
+# - .github/ (CI/CD et workflows)
+# - crates/ (code source principal)
+
+# - .rustfmt.toml, rust-toolchain.toml (configuration Rust partagée)
+# - tests/ (si présent - tests d'intégration)
+# =============================================================================

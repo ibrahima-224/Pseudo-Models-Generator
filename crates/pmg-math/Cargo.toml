@@ -1,0 +1,24 @@
+# Crate pmg-math — moteur mathématique et statistique déterministe.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.3.
+[package]
+name = "pmg-math"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+rand = { workspace = true }
+rand_core = "0.10"
+rand_chacha = { workspace = true }
+serde = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

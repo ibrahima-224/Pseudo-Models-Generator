@@ -1,0 +1,18 @@
+# Crate pmg-validate — validation de pseudo-modèles (4 niveaux).
+# Référence : docs/architecture/02-workspace-et-crates.md §3.9 et §4.
+[package]
+name = "pmg-validate"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+pmg-io = { path = "../pmg-io" }
+pmg-math = { path = "../pmg-math" }
+pmg-models = { path = "../pmg-models" }

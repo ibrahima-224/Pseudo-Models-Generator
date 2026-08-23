@@ -1,0 +1,55 @@
+# Crate pmg-cli — interface utilisateur en ligne de commande (binaire).
+# Référence : docs/architecture/02-workspace-et-crates.md §3.12 et §4.
+[package]
+name = "pmg-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Graphe de dépendances conforme à docs/architecture/02-workspace-et-crates.md §4
+# (les autres crates métier sont atteignables transitivement).
+pmg-generator = { path = "../pmg-generator" }
+pmg-inspect = { path = "../pmg-inspect" }
+pmg-validate = { path = "../pmg-validate" }
+pmg-compare = { path = "../pmg-compare" }
+pmg-meta = { path = "../pmg-meta" }
+pmg-math = { path = "../pmg-math" }
+pmg-blueprint = { path = "../pmg-blueprint" }
+pmg-core = { path = "../pmg-core" }
+pmg-io = { path = "../pmg-io" }
+pmg-models = { path = "../pmg-models" }
+pmg-gpu = { path = "../pmg-gpu", optional = true }
+pmg-compression = { path = "../pmg-compression", optional = true }
+
+# Dépendances CLI
+# Mise à jour vers clap 4.x pour corriger RUSTSEC-2024-0375 (atty) et RUSTSEC-2024-0370 (proc-macro-error)
+clap = { version = "4.6", features = ["derive", "wrap_help"] }
+anyhow = "1.0"
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+safetensors = "0.8"
+tokio = { workspace = true }
+num_cpus = { workspace = true }
+
+[features]
+default = ["cpu-fallback"]
+gpu-acceleration = ["pmg-gpu/gpu", "pmg-generator/gpu-acceleration"]
+compression = ["pmg-compression", "pmg-generator/compression"]
+cpu-fallback = []
+
+[[bin]]
+name = "pmg"
+path = "src/main.rs"
+
+[dev-dependencies]
+# Tests E2E
+assert_cmd = "2.0"
+predicates = "3.0"
+tempfile = "3.27"

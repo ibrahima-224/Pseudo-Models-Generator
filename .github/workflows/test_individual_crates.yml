@@ -1,0 +1,100 @@
+name: Tests Ciblés par Crate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  MAX_MEMORY_MB: 1024
+  MAX_TIME_SECONDS: 60
+
+jobs:
+  test-crates:
+    name: Tests individuels par crate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        crate:
+          - pmg-core
+          - pmg-compression
+          - pmg-io
+          - pmg-models
+          - pmg-validate
+          - pmg-cli
+          - pmg-compare
+          - pmg-math
+          - pmg-meta
+          - pmg-blueprint
+          - pmg-injector
+          - pmg-inspect
+          - pmg-generator
+          - pmg-bench
+          # pmg-gpu exclu (nécessite CUDA)
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Run tests for ${{ matrix.crate }}
+        run: |
+          chmod +x scripts/test_individual_crates_memory.sh
+          ./scripts/test_individual_crates_memory.sh \
+            -m ${{ env.MAX_MEMORY_MB }} \
+            -t ${{ env.MAX_TIME_SECONDS }} \
+            ${{ matrix.crate }}
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.crate }}
+          path: test_logs/
+          retention-days: 7
+
+  test-summary:
+    name: Résumé des tests
+    runs-on: ubuntu-latest
+    needs: test-crates
+    if: always()
+    
+    steps:
+      - name: Download all logs
+        uses: actions/download-artifact@v4
+        with:
+          path: test_logs/
+
+      - name: Generate summary
+        run: |
+          echo "# Résumé des tests ciblés par crate" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Crates testés" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for log in test_logs/test-logs-*/test_*.log; do
+            if [ -f "$log" ]; then
+              crate=$(basename "$log" .log | sed 's/test_//')
+              if grep -q "SUCCÈS" "$log"; then
+                echo "- ✅ $crate" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- ❌ $crate" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done

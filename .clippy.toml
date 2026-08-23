@@ -1,0 +1,13 @@
+# Configuration Clippy de PMG.
+# Référence : docs/architecture/02-workspace-et-crates.md §7.
+#
+# Principes :
+# - Aucune exception globale de lint : les portes CI passent par
+#   `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+# - Seuils de complexité conservés aux valeurs par défaut (aucun seuil
+#   personnalisé ; le nom du seuil a changé selon les versions de Clippy, on
+#   s'en remet donc aux valeurs par défaut documentées).
+#
+# La limite de 500 lignes par fichier n'est pas configurable dans Clippy :
+# elle est vérifiée en CI par le script scripts/check_file_size.sh
+# (cf. docs/architecture/08-plan-implementation.md L0).

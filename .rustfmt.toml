@@ -1,0 +1,7 @@
+# Configuration rustfmt de PMG.
+# Référence : docs/architecture/02-workspace-et-crates.md §7.
+edition = "2021"
+max_width = 100
+use_small_heuristics = "Default"
+fn_params_layout = "Tall"
+match_block_trailing_comma = true

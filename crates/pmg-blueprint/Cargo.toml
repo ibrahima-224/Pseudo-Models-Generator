@@ -1,0 +1,18 @@
+# Crate pmg-blueprint — description abstraite des pseudo-modèles.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.2.
+[package]
+name = "pmg-blueprint"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
