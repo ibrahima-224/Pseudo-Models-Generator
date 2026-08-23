@@ -1,0 +1,79 @@
+[package]
+name = "pmg-bench"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Benchmarks de performance pour PMG"
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+pmg-blueprint = { path = "../pmg-blueprint" }
+pmg-math = { path = "../pmg-math" }
+pmg-injector = { path = "../pmg-injector" }
+pmg-io = { path = "../pmg-io" }
+pmg-generator = { path = "../pmg-generator" }
+pmg-validate = { path = "../pmg-validate" }
+pmg-compare = { path = "../pmg-compare" }
+criterion = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+memory-stats = "1.1"
+rand = "0.10"
+
+[[bench]]
+name = "injection_benchmarks"
+harness = false
+
+[[bench]]
+name = "io_benchmarks"
+harness = false
+
+[[bench]]
+name = "memory_benchmarks"
+harness = false
+
+[[bench]]
+name = "generation_benchmarks"
+harness = false
+
+[[bench]]
+name = "validation_benchmarks"
+harness = false
+
+[[bench]]
+name = "comparison_benchmarks"
+harness = false
+
+[[bench]]
+name = "rng_distribution_benchmarks"
+harness = false
+
+[[bench]]
+name = "statistics_benchmarks"
+harness = false
+
+[[bench]]
+name = "tensor_generation_benchmarks"
+harness = false
+
+[[bench]]
+name = "outlier_benchmarks"
+harness = false
+
+[[bench]]
+name = "low_rank_benchmarks"
+harness = false
+
+[[bench]]
+name = "packing_benchmarks"
+harness = false
+
+[[bench]]
+name = "streaming_writer_benchmarks"
+harness = false
+
+[[bench]]
+name = "header_parse_benchmarks"
+harness = false

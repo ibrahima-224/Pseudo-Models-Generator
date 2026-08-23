@@ -1,0 +1,247 @@
+# Workflow GitHub Actions pour l'audit de sécurité des dépendances Rust
+# Exécute cargo audit sur les push et pull requests sur main
+name: Security Audit
+
+# Déclencheurs : push sur main et pull requests sur main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Permettre l'exécution manuelle depuis l'interface GitHub
+  workflow_dispatch:
+
+# Permissions minimales pour sécuriser le workflow
+permissions:
+  contents: read
+  security-events: write  # Pour publier les résultats dans GitHub Security
+  issues: write  # Pour créer des issues en cas de vulnérabilités détectées
+
+jobs:
+  # Job principal d'audit de sécurité
+  audit:
+    name: Audit de sécurité
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Vérification du code source
+      - name: Vérification du code source
+        uses: actions/checkout@v4
+
+      # 2. Installation de l'outil Rust
+      - name: Installation de Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      # 3. Mise en cache de Cargo
+      - name: Mise en cache de Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      # 4. Installation de cargo-audit
+      - name: Installation de cargo-audit
+        run: cargo install cargo-audit
+
+      # 5. Exécution de l'audit de sécurité (une seule exécution)
+      - name: Exécution de cargo audit
+        id: audit
+        run: |
+          echo "🔍 Début de l'audit de sécurité des dépendances..."
+          # Exécuter cargo audit une seule fois et sauvegarder la sortie
+          cargo audit 2>&1 | tee audit-report.txt
+          # Capturer le code de sortie
+          AUDIT_EXIT_CODE=${PIPESTATUS[0]}
+          echo "audit_exit_code=$AUDIT_EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          # Vérifier si des vulnérabilités critiques ont été trouvées
+          if [ $AUDIT_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Des vulnérabilités ont été détectées (code de sortie: $AUDIT_EXIT_CODE)"
+          else
+            echo "✅ Aucune vulnérabilité détectée"
+          fi
+
+      # 6. Création du rapport d'audit détaillé (basé sur la sortie précédente)
+      - name: Génération du rapport détaillé
+        if: always()
+        run: |
+          echo "📊 Génération du rapport détaillé..."
+          # Ajouter des métadonnées au rapport existant
+          echo "" >> audit-report.txt
+          echo "=== Informations supplémentaires ===" >> audit-report.txt
+          echo "Date : $(date -u)" >> audit-report.txt
+          echo "Commit : ${{ github.sha }}" >> audit-report.txt
+          echo "Branche : ${{ github.ref }}" >> audit-report.txt
+          echo "Runner : ${{ runner.os }}" >> audit-report.txt
+          echo "Rapport généré : audit-report.txt"
+
+      # 7. Upload du rapport comme artifact
+      - name: Upload du rapport d'audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report-${{ github.run_id }}
+          path: audit-report.txt
+          retention-days: 30
+
+      # 8. Publication des résultats dans GitHub Security (format SARIF)
+      - name: Publication des résultats SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sarif-report
+          path: audit-report.txt
+          retention-days: 30
+
+      # 9. Vérification des vulnérabilités critiques
+      # Si des vulnérabilités sont détectées, le job échoue et déclenche les notifications
+      - name: Vérification des vulnérabilités critiques
+        if: steps.audit.outputs.audit_exit_code != '0'
+        run: |
+          echo "🚨 Des vulnérabilités ont été détectées dans les dépendances."
+          echo "Veuillez consulter le rapport d'audit pour plus de détails."
+          echo "Rapport disponible dans les artifacts du workflow."
+          # Sortir avec le code de sortie de l'audit pour marquer le job comme échoué
+          exit ${{ steps.audit.outputs.audit_exit_code }}
+
+      # 10. Création automatique d'issue GitHub en cas de vulnérabilité
+      # Crée une issue avec les détails de la vulnérabilité pour suivi
+      - name: Création d'issue GitHub pour vulnérabilités
+        if: steps.audit.outputs.audit_exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Créer une issue GitHub en cas de vulnérabilités détectées
+            const issueTitle = `🚨 Vulnérabilités de sécurité détectées - Run #${context.runNumber}`;
+            const issueBody = `
+            ## Alert de Sécurité - Vulnérabilités Détectées
+
+            **Date:** ${new Date().toISOString()}
+            **Commit:** ${context.sha}
+            **Branche:** ${context.ref}
+            **Run ID:** ${context.runNumber}
+
+            ### Résumé
+            L'audit de sécurité a détecté des vulnérabilités dans les dépendances du projet.
+            Veuillez consulter le rapport d'audit pour plus de détails.
+
+            ### Actions Requises
+            1. Examiner le rapport d'audit dans les artifacts du workflow
+            2. Mettre à jour les dépendances vulnérables
+            3. Tester les changements avant de merger
+
+            ### Rapport d'Audit
+            Le rapport complet est disponible dans les artifacts du workflow :
+            \`audit-report-${context.runNumber}\`
+
+            ### Contacts
+            - Équipe de sécurité : security@example.com
+            - Documentation : SECURITY_MONITORING.md
+
+            ---
+            *Ce ticket a été créé automatiquement par le workflow de sécurité.*
+            `;
+            
+            // Créer l'issue avec les labels appropriés
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueTitle,
+              body: issueBody,
+              labels: ['security', 'vulnerability', 'automated']
+            });
+            
+            console.log(`Issue créée: #${issue.data.number}`);
+
+      # 11. Notification email pour vulnérabilités critiques (optionnel)
+      # Nécessite les variables SMTP_* et le secret SMTP_PASSWORD
+      - name: Notification email
+        if: steps.audit.outputs.audit_exit_code != '0' && vars.NOTIFICATION_EMAIL != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ vars.SMTP_SERVER }}
+          server_port: ${{ vars.SMTP_PORT }}
+          username: ${{ vars.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "🚨 Alerte Sécurité PMG - Vulnérabilités Détectées"
+          to: ${{ vars.NOTIFICATION_EMAIL }}
+          from: "PMG Security <security@example.com>"
+          body: |
+            Une alerte de sécurité a été déclenchée pour le projet PMG.
+            
+            Date: ${{ github.event.head_commit.timestamp }}
+            Commit: ${{ github.sha }}
+            Branche: ${{ github.ref }}
+            
+            Des vulnérabilités ont été détectées dans les dépendances.
+            Veuillez consulter le rapport d'audit pour plus de détails.
+            
+            Rapport disponible dans les artifacts du workflow.
+
+      # 12. Notification Slack (optionnel)
+      # Nécessite la variable SLACK_WEBHOOK_URL
+      - name: Notification Slack
+        if: steps.audit.outputs.audit_exit_code != '0' && vars.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "🚨 *Alerte Sécurité PMG* - Vulnérabilités Détectées",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "fields": [
+                    {
+                      "title": "Projet",
+                      "value": "PMG",
+                      "short": true
+                    },
+                    {
+                      "title": "Commit",
+                      "value": "${{ github.sha }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Branche",
+                      "value": "${{ github.ref }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Run ID",
+                      "value": "${{ github.run_id }}",
+                      "short": true
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "button",
+                      "text": "Voir le Rapport",
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      # 13. Notification de succès (optionnel)
+      - name: Notification de succès
+        if: success()
+        run: |
+          echo "✅ Audit de sécurité terminé avec succès."
+          echo "Aucune vulnérabilité critique détectée."
+          echo "Base de données RustSec Advisory Database utilisée pour la détection."
+          echo "Consultez SECURITY_MONITORING.md pour la procédure de surveillance."

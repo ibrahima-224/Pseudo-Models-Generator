@@ -1,0 +1,68 @@
+# Workspace Cargo du projet PMG (Pseudo-Models Generator).
+# Référence normative : docs/architecture/02-workspace-et-crates.md §2.
+
+[workspace]
+members = [
+    "crates/pmg-core",
+    "crates/pmg-blueprint",
+    "crates/pmg-math",
+    "crates/pmg-injector",
+    "crates/pmg-generator",
+    "crates/pmg-io",
+    "crates/pmg-models",
+    "crates/pmg-inspect",
+    "crates/pmg-validate",
+    "crates/pmg-compare",
+    "crates/pmg-meta",
+    "crates/pmg-cli",
+    # "crates/pmg-bench",  # Exclu des tests normaux (optimisation mémoire)
+    "crates/pmg-compression",
+    "crates/pmg-gpu",
+]
+exclude = ["crates/pmg-bench"]  # Exclure pmg-bench des tests normaux (réduit le temps de compilation et d'exécution)
+resolver = "2"
+
+[workspace.package]
+# Métadonnées partagées par les 12 crates (publish = false).
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.80"
+license = "GPL-3.0"
+description = "Pseudo-Models Generator (PMG) — générateur déterministe de pseudo-modèles de réseaux de neurones (cibles pour la version 1 : GLM-5.2, DeepSeek-V4-Flash)."
+repository = "https://github.com/Ibrahima-224/Pseudo-Models-Generator"
+authors = ["Ibrahima-224"]
+publish = true
+
+[workspace.dependencies]
+# Dépendances communes centralisées (versions pinées, auditées).
+# Référence : docs/architecture/02-workspace-et-crates.md §2.
+# NB : une entrée n'est compilée que lorsqu'une crate la référence ;
+# les crates du Sprint 0 n'utilisent encore aucune dépendance externe.
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+rand = { version = "0.10", default-features = false, features = ["std_rng", "std"] }
+rand_chacha = "0.10"
+rand_core = "0.10"
+clap = { version = "4.6", features = ["derive", "wrap_help"] }
+anyhow = "1.0"
+sha2 = "0.11"
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+num_cpus = "1.17"
+# Dev uniquement :
+tempfile = "3.27"
+criterion = "0.8"
+
+# Profils optimisés pour les livraisons release.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+# Profil optimisé pour les tests release (compilation plus rapide)
+[profile.release-test]
+inherits = "release"
+opt-level = 2
+lto = "thin"
+codegen-units = 4

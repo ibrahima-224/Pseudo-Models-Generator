@@ -1,0 +1,23 @@
+# Crate pmg-inspect — inspection `espec` (metadata-first).
+# Référence : docs/architecture/02-workspace-et-crates.md §3.8 et §4.
+[package]
+name = "pmg-inspect"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+pmg-io = { path = "../pmg-io" }
+pmg-blueprint = { path = "../pmg-blueprint" }
+pmg-models = { path = "../pmg-models" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

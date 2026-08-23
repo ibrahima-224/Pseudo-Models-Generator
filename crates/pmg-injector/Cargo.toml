@@ -1,0 +1,22 @@
+# Crate pmg-injector — moteur d'injection structurelle.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.4 et §4.
+[package]
+name = "pmg-injector"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+pmg-blueprint = { path = "../pmg-blueprint" }
+pmg-math = { path = "../pmg-math" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

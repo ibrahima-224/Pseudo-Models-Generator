@@ -1,0 +1,27 @@
+{
+  "model_type": "deepseek_v4",
+  "architecture": "DeepseekV4ForCausalLM",
+  "hidden_size": 4096,
+  "num_attention_heads": 64,
+  "num_hidden_layers": 43,
+  "vocab_size": 129280,
+  "max_position_embeddings": 1048576,
+  "n_routed_experts": 256,
+  "n_shared_experts": 1,
+  "expert_capacity": 6,
+  "tensor_patterns": [
+    "model.embed_tokens.weight",
+    "model.layers.{layer}.self_attn.q_proj.weight",
+    "model.layers.{layer}.self_attn.k_proj.weight",
+    "model.layers.{layer}.self_attn.v_proj.weight",
+    "model.layers.{layer}.self_attn.o_proj.weight",
+    "model.layers.{layer}.mlp.gate_proj.weight",
+    "model.layers.{layer}.mlp.up_proj.weight",
+    "model.layers.{layer}.mlp.down_proj.weight",
+    "model.layers.{layer}.mlp.experts.{expert}.gate_proj.weight",
+    "model.layers.{layer}.mlp.experts.{expert}.up_proj.weight",
+    "model.layers.{layer}.mlp.experts.{expert}.down_proj.weight",
+    "model.norm.weight",
+    "lm_head.weight"
+  ]
+}

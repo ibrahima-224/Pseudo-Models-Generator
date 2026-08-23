@@ -1,0 +1,31 @@
+{
+  "name": "glm52_statistical_profile",
+  "version": "1.0.0",
+  "description": "Profil statistique pour GLM-5.2",
+  "distributions": {
+    "weight_distribution": "normal",
+    "outlier_distribution": "student_t",
+    "correlation_strength": 0.3,
+    "low_rank_strength": 0.1
+  },
+  "outlier_config": {
+    "probability": 0.01,
+    "severity_factor": 3.0,
+    "layer_variation": true
+  },
+  "correlation_config": {
+    "enabled": true,
+    "max_correlation": 0.5,
+    "layer_decay": 0.9
+  },
+  "low_rank_config": {
+    "enabled": true,
+    "rank_ratio": 0.1,
+    "strength": 0.05
+  },
+  "super_weight_config": {
+    "enabled": true,
+    "probability": 0.001,
+    "magnitude_factor": 10.0
+  }
+}

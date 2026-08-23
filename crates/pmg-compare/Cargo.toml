@@ -1,0 +1,19 @@
+# Crate pmg-compare — comparaison metadata-only de modèles.
+# Référence : docs/architecture/02-workspace-et-crates.md §3.10 et §4.
+[package]
+name = "pmg-compare"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+pmg-core = { path = "../pmg-core" }
+pmg-io = { path = "../pmg-io" }
+pmg-blueprint = { path = "../pmg-blueprint" }
+pmg-models = { path = "../pmg-models" }
+pmg-math = { path = "../pmg-math" }

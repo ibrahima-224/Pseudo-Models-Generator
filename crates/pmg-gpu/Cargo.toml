@@ -1,0 +1,40 @@
+[package]
+name = "pmg-gpu"
+version = "1.0.0"
+edition = "2021"
+description = "Accélération GPU pour PMG"
+license = "GPL-3.0"
+authors = ["Ibrahima-224"]
+repository = "https://github.com/Ibrahima-224/Pseudo-Models-Generator"
+rust-version = "1.80"
+
+[dependencies]
+# Dépendances Rust
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+log = "0.4"
+rand = { workspace = true, default-features = false, features = ["std_rng"] }
+rand_core = "0.10"
+rand_chacha = "0.10"
+
+# Dépendances GPU (optionnelles)
+# Note: cuda-sys et cust sont des crates pour CUDA. Ils ne sont disponibles que si CUDA est installé.
+# Nous utilisons des cfg flags pour conditionner leur compilation.
+cust = { version = "0.3", optional = true }
+
+[features]
+default = ["cpu-fallback"]
+gpu = ["cpu-fallback"]
+cuda = ["cust"]
+cpu-fallback = []
+
+[build-dependencies]
+# cuda-builder = { version = "0.3", optional = true }
+
+[[bench]]
+name = "gpu_cpu_benchmarks"
+harness = false
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"] }
